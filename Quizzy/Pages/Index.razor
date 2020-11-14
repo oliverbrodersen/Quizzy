@@ -1,0 +1,148 @@
+﻿@page "/"
+@using Quizzy.Data;
+@using Quizzy.Models;
+@using Quizzy.Auth;
+@using System.Web;
+@using System.Timers;
+@using System.Threading;
+
+@inject IUserService UserService;
+@inject QuizService QuizService;
+@inject NavigationManager NavigationManager;
+@inject AuthenticationStateProvider CustomAuthenticationStateProvider
+    <div class="quizContainer">
+        <div class="quiz">
+            <AuthorizeView>
+                <NotAuthorized>
+                    <LoginComponent.Login />
+                </NotAuthorized>
+                <Authorized>
+                    <div class="info">
+                        <p class="time @TimeState">@QuizService.GetTimeLeft()</p>
+                        <p class="name">@getUser()</p>
+                    </div>
+                    <div class="info">
+                        <p class="difficulty">@quiz.difficulty</p>
+                        <p class="category">@quiz.category</p>
+                    </div>
+                    <h1>@decodeHtml(quiz.question)?</h1>
+                    <div class="answerContainer">
+                        @for (int i = 0; i < Answers.Count(); i++)
+                        {
+                            int num = i;
+                            <p class="@(SelectedAnswer[num]?SelectedType:"")" @onclick="@(() => SelectAnswer(num))">@decodeHtml(Answers[num])</p>
+                        }
+                    </div>
+                    <input type="button" class="answerButton" @onclick="AnswerNow" value="Answer!" />
+                </Authorized>
+            </AuthorizeView>
+        </div>
+        <div class="leaderboard">
+            <h2>Leaderboard</h2>
+            <table>
+                <tr>
+                    <td>User</td>
+                    <td>Score</td>
+                    <td class="check">&#x2713;</td>
+                    <td class="x">&#119857;</td>
+                </tr>
+                @foreach (UserInfo ui in userInfos)
+                {
+                    <tr>
+                        <td>@ui.Id</td>
+                        <td>@ui.Score</td>
+                        <td>@ui.CorrectAnswers</td>
+                        <td>@ui.IncorrectAnswers</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+    @code{
+        private Quiz quiz { get; set; }
+        private List<bool> SelectedAnswer = new List<bool>();
+        private List<string> Answers;
+        private List<UserInfo> userInfos;
+        private System.Timers.Timer t;
+        private string TimeLeft { get; set; }
+        private string _SelectedAnswer;
+        private string TimeState = "";
+        public string SelectedType = "selected";
+        private bool hasAnswered = false;
+
+
+        protected override void OnInitialized()
+        {
+            getQuiz();
+            userInfos = UserService.GetLeaderboard();
+            QuizService.SomethingHappened += HandleEvent;
+        }
+
+        private void getQuiz()
+        {
+            SelectedType = "";
+            SelectedAnswer.Clear();
+            quiz = QuizService.getQuizAsync();
+            Answers = quiz.GetAnswers();
+            clearSelected();
+            SelectedType = "selected";
+            _SelectedAnswer = null;
+            hasAnswered = false;
+            userInfos = UserService.GetLeaderboard();
+        }
+
+        public void SelectAnswer(int i)
+        {
+            if (!hasAnswered)
+            {
+                clearSelected();
+                SelectedAnswer[i] = true;
+                _SelectedAnswer = Answers[i];
+            }
+        }
+        public async void AnswerNow()
+        {
+            if (_SelectedAnswer != null && !hasAnswered)
+            {
+                hasAnswered = true;
+                bool win = QuizService.Answer(_SelectedAnswer);
+                userInfos = await UserService.UpdateScore(win, quiz.difficulty, getUser());
+                SelectedType = win ? "correct" : "incorrect";
+            }
+        }
+        private void clearSelected()
+        {
+            SelectedAnswer.Clear();
+            foreach (string s in Answers)
+            {
+                SelectedAnswer.Add(false);
+            }
+        }
+        private string getUser()
+        {
+            return ((CustomAuthenticationStateProvider)CustomAuthenticationStateProvider).cachedUser.Id;
+        }
+
+        private string decodeHtml(string s)
+        {
+            return HttpUtility.HtmlDecode(s);
+        }
+        public void HandleEvent(object sender, EventArgs args)
+        {
+            TimeLeft = ((QuizService)sender).GetTimeLeft();
+            int t = int.Parse(TimeLeft);
+
+            if (t <= 5) TimeState = "state2";
+            else if (t <= 10) TimeState = "state1";
+            else if (t == 20) {
+                if (!quiz.question.Equals(((QuizService)sender).qurrentQuiz.question))
+                {
+                    getQuiz();
+                }
+                TimeState = "";
+            }
+            else TimeState = "";
+
+            InvokeAsync(StateHasChanged);
+        }
+    }

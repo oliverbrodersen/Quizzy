@@ -1,0 +1,164 @@
+﻿@page "/login"
+@namespace LoginComponent
+@using Quizzy.Auth
+@using System.Security.Cryptography;
+
+@inject AuthenticationStateProvider CustomAuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<div class="loginForm">
+
+    <div class="loginFormCenter">
+        <AuthorizeView>
+            <NotAuthorized>
+                <table>
+                    <tr>
+                        <td>
+                            <h2>Log in:</h2>
+                            <form>
+                                <div class="group">
+                                    <input type="text" @bind-value="username">
+                                    <span class="highlight"></span>
+                                    <span class="bar"></span>
+                                    <label>Username</label>
+                                </div>
+
+                                <div class="group">
+                                    <input type="password" @onkeyup="KeyUpAsync" @bind-value="password">
+                                    <span class="highlight"></span>
+                                    <span class="bar"></span>
+                                    <label>Password</label>
+                                </div>
+
+                                <a href="" @onclick="PerformLogin">
+                                    Login
+                                </a>
+                            </form>
+                        </td>
+                        <td>
+                            <h2>Register:</h2>
+                            <form>
+                                <div class="group">
+                                    <input type="text" @bind-value="usernameRegister">
+                                    <span class="highlight"></span>
+                                    <span class="bar"></span>
+                                    <label>Username</label>
+                                </div>
+
+                                <div class="group">
+                                    <input type="password" @bind-value="passwordRegister">
+                                    <span class="highlight"></span>
+                                    <span class="bar"></span>
+                                    <label>Password</label>
+                                </div>
+                                <div class="group">
+                                    <input type="password" @bind-value="password2Register">
+                                    <span class="highlight"></span>
+                                    <span class="bar"></span>
+                                    <label>Repeat password</label>
+                                </div>
+                                <a href="" @onclick="PerformRegister">
+                                    Signin
+                                </a>
+                            </form>
+                        </td>
+                    </tr>
+                </table>
+                <div style="color:red">@errorMessage</div>
+            </NotAuthorized>
+            <Authorized>
+                <a href="" @onclick="PerformLogout">
+                    Log out
+                </a>
+            </Authorized>
+        </AuthorizeView>
+    </div>
+</div>
+
+@code {
+    private string username;
+    private string password;
+    private string errorMessage;
+    private string usernameRegister;
+    private string passwordRegister;
+    private string password2Register;
+
+    public async Task PerformLogin()
+    {
+        errorMessage = "";
+        try
+        {
+            await ((CustomAuthenticationStateProvider)CustomAuthenticationStateProvider).ValidateLoginAsync(username, HashPass(password));
+            username = "";
+            password = "";
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception e)
+        {
+            errorMessage = e.Message;
+        }
+    }
+    public async Task PerformRegister()
+    {
+        errorMessage = "";
+        if(usernameRegister == "")
+        {
+            errorMessage = "Enter username";
+        }
+        else if (!passwordRegister.Equals(password2Register))
+        {
+            errorMessage = "Passwords doesn't match";
+        }
+        else
+        {
+            try
+            {
+                await ((CustomAuthenticationStateProvider)CustomAuthenticationStateProvider).RegisterAsync(usernameRegister, HashPass(passwordRegister));
+                usernameRegister = "";
+                passwordRegister = "";
+                password2Register = "";
+                NavigationManager.NavigateTo("/");
+            }
+            catch (Exception e)
+            {
+                errorMessage = e.Message;
+            }
+        }
+    }
+    private string HashPass(string password)
+    {
+        byte[] salt;
+        new RNGCryptoServiceProvider().GetBytes(salt = new byte[16]);
+
+        var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000);
+        byte[] hash = pbkdf2.GetBytes(20);
+
+        byte[] hashBytes = new byte[36];
+        Array.Copy(salt, 0, hashBytes, 0, 16);
+        Array.Copy(hash, 0, hashBytes, 16, 20);
+
+        return Convert.ToBase64String(hashBytes);
+    }
+
+    async void KeyUpAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await PerformLogin();
+        }
+    }
+    public async Task PerformLogout()
+    {
+        errorMessage = "";
+        username = "";
+        password = "";
+        try
+        {
+            ((CustomAuthenticationStateProvider)CustomAuthenticationStateProvider).Logout();
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception e) { }
+    }
+
+}
+
