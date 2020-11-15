@@ -13,6 +13,7 @@ namespace Quizzy.Models
         public int Score { get; set; }
         public int CorrectAnswers { get; set; }
         public int IncorrectAnswers { get; set; }
-
+        public int SecurityLevel { get; set; }
+        public string LastQuestionAnswers { get; set; }
     }
 }

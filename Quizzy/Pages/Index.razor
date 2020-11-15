@@ -11,16 +11,22 @@
 @inject NavigationManager NavigationManager;
 @inject AuthenticationStateProvider CustomAuthenticationStateProvider
     <div class="quizContainer">
+        <div class="logo">Quizzy</div>
         <div class="quiz">
-            <AuthorizeView>
+            <AuthorizeView Context="General">
                 <NotAuthorized>
                     <LoginComponent.Login />
                 </NotAuthorized>
                 <Authorized>
                     <div class="info">
                         <p class="time @TimeState">@QuizService.GetTimeLeft()</p>
-                        <p class="name">@getUser()</p>
-                    </div>
+                        <p class="name">
+                            <a  data-tooltip="Log out" href="" @onclick="PerformLogout">@getUser()</a>
+                            <AuthorizeView Context="Admin" Policy="Admin">
+                                        <a href="/admin">/admin</a>
+                            </AuthorizeView>
+                            </p>
+                        </div>
                     <div class="info">
                         <p class="difficulty">@quiz.difficulty</p>
                         <p class="category">@quiz.category</p>
@@ -59,6 +65,9 @@
         </div>
     </div>
     @code{
+        [CascadingParameter]
+        private Task<AuthenticationState> authenticationStateTask { get; set; }
+
         private Quiz quiz { get; set; }
         private List<bool> SelectedAnswer = new List<bool>();
         private List<string> Answers;
@@ -75,6 +84,14 @@
             getQuiz();
             userInfos = await UserService.GetLeaderboard();
             QuizService.SomethingHappened += HandleEvent;
+
+            var authState = await authenticationStateTask;
+            var user = authState.User;
+
+            if (user.Identity.IsAuthenticated)
+            {
+                //hasAnswered = await ((UserInfo)UserService.GetUser()).LastQuestionAnswers.Equals(quiz.question);
+            }
         }
 
         private async Task getQuiz()
@@ -105,8 +122,16 @@
             {
                 hasAnswered = true;
                 bool win = QuizService.Answer(_SelectedAnswer);
-                userInfos = await UserService.UpdateScore(win, quiz.difficulty, getUser());
-                SelectedType = win ? "correct" : "incorrect";
+                List<UserInfo> userInfosRecieved = await UserService.UpdateScore(win, quiz.question, quiz.difficulty, getUser());
+                if(userInfosRecieved != null)
+                {
+                    SelectedType = win ? "correct" : "incorrect";
+                    userInfos = userInfosRecieved;
+                }
+                else
+                {
+                    SelectedType = "";
+                }
             }
         }
         private void clearSelected()
@@ -139,5 +164,14 @@
                 getQuiz();
             }
             InvokeAsync(StateHasChanged);
+        }
+        public async Task PerformLogout()
+        {
+            try
+            {
+                ((CustomAuthenticationStateProvider)CustomAuthenticationStateProvider).Logout();
+                NavigationManager.NavigateTo("/");
+            }
+            catch (Exception e) { }
         }
     }

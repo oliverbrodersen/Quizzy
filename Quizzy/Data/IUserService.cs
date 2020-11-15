@@ -13,7 +13,7 @@ namespace Quizzy.Data
         Task SaveAsync();
         Task DeleteUser(string Id);
         void Update(UserInfo u);
-        Task<List<UserInfo>> UpdateScore(bool won, string diff, string id);
+        Task<List<UserInfo>> UpdateScore(bool won, string q, string diff, string id);
         Task<List<UserInfo>> GetLeaderboard();
         Task<bool> RegisterAsync(string Username, string Password);
 

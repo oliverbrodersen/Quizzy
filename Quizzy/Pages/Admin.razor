@@ -1,4 +1,6 @@
 ﻿@page "/admin"
+@attribute [Authorize(Policy = "Admin")]
+
 @using System.Web;
 @using Quizzy.Models;
 @using Quizzy.Data;
@@ -7,33 +9,70 @@
 
 <div class="quizContainer">
     <div class="quiz">
-        <p>Qurrent querstion:</p>
+        <div class="info">
+            <p>Qurrent querstion:</p>
+            <a href="/">/back</a>
+        </div>
         <h1 class="adminQuestion">@decodeHtml(quiz.question)?</h1>
         <div class="info">
             <p>@TimeLeft</p>
             <p>Answer: @decodeHtml(quiz.correct_answer)</p>
         </div>
-        <table class="adminTable">
+        <br />
+        <table style="width: 100%;">
+            <tr>
+                <td>
+                    <p>Category</p>
+                    <select @onchange="@((arg) => updateCategory(arg))">
+                        <option value="0" selected="@(QuizService.getCategory() == 0)">Any</option>
+                        @foreach (TriviaCategory tc in QuizService.getCategories().TriviaCategories)
+                        {
+                            <option value="@tc.Id" selected="@(QuizService.getCategory() == tc.Id)">@tc.Name</option>
+                        }
+                    </select>
+                </td>
+                <td>
+                    <p>Difficulty</p>
+                    <select @onchange="@((arg) => updateDifficulty(arg))">
+                        <option value="0" selected="@(QuizService.getDifficulty().Equals("0"))">Any</option>
+                        <option value="easy" selected="@(QuizService.getDifficulty().Equals("easy"))">Easy</option>
+                        <option value="medium" selected="@(QuizService.getDifficulty().Equals("medium"))">Medium</option>
+                        <option value="hard" selected="@(QuizService.getDifficulty().Equals("hard"))">Hard</option>
+                    </select>
+                </td>
+                <td>
+                    <p>Duration</p>
+                    <input type="number" value="@QuizService.getDurration()" @onchange="@((arg) => updateDurration(arg))"/>
+                </td>
+                <td>
+                    <input type="button" value="Next Question >" @onclick="Next" />
+                </td>
+            </tr>
+        </table>
+        <small>*Updates instantly</small>
+        <div class="seperator"></div>
+        <table class="adminTable" style="width: 100%;">
             <tr>
                 <td>User</td>
                 <td>Score</td>
                 <td class="check">&#x2713;</td>
                 <td class="x">&#119857;</td>
+                <td>Security</td>
                 <td class="trash">&#128465;</td>
             </tr>
             @foreach (UserInfo ui in userInfos)
             {
                 <tr>
                     <td>@ui.Id</td>
-                    <td><input type="number" value="@ui.Score" @onchange="@(e => UpdateScore(ui,e))" /></td>
-                    <td><input type="number" value="@ui.CorrectAnswers" @onchange="@(e => UpdateCA(ui,e))" /></td>
-                    <td><input type="number" value="@ui.IncorrectAnswers" @onchange="@(e => UpdateIA(ui,e))" /></td>
+                    <td><input type="number" value="@ui.Score" @onchange="@(e => Update(ui,"score",e))" /></td>
+                    <td><input type="number" value="@ui.CorrectAnswers" @onchange="@(e => Update(ui,"correct",e))" /></td>
+                    <td><input type="number" value="@ui.IncorrectAnswers" @onchange="@(e => Update(ui,"incorrect",e))" /></td>
+                    <td><input type="number" value="@ui.SecurityLevel" @onchange="@(e => Update(ui,"security",e))" /></td>
                     <td><button class="trashButton" @onclick="@(() => DeleteUser(@ui.Id))">&#128465;</button></td>
                 </tr>
             }
         </table>
         <input type="button" value="Save" @onclick="Save" />
-        <input type="button" value="Next Question" @onclick="Next" />
     </div>
 </div>
 
@@ -60,6 +99,18 @@
         quiz = QuizService.getQuizAsync();
     }
 
+    public void updateCategory(ChangeEventArgs e)
+    {
+        QuizService.updateCategory(int.Parse(e.Value.ToString()));
+    }
+    public void updateDifficulty(ChangeEventArgs e)
+    {
+        QuizService.updateDifficulty(e.Value.ToString());
+    }
+    public void updateDurration(ChangeEventArgs e)
+    {
+        QuizService.updateDurration(int.Parse(e.Value.ToString()));
+    }
     private async Task DeleteUser(string id)
     {
         await UserService.DeleteUser(id);
@@ -67,30 +118,23 @@
         if (ui != null)
             userInfos.Remove(ui);
     }
-    private void UpdateScore(UserInfo user, ChangeEventArgs args)
+
+    private void Update(UserInfo user, string att, ChangeEventArgs args)
     {
+        int v = 0;
         if (!string.IsNullOrEmpty((string)args.Value) && ((string)args.Value).All(Char.IsDigit))
-            user.Score = int.Parse((string)args.Value);
-        else
-            user.Score = 0;
+            v = int.Parse((string)args.Value);
+
+        switch (att)
+        {
+            case "score": user.Score = v; break;
+            case "correct": user.CorrectAnswers = v; break;
+            case "incorrect": user.IncorrectAnswers = v; break;
+            case "security": user.SecurityLevel = v; break;
+        }
         UserService.Update(user);
     }
-    private void UpdateCA(UserInfo user, ChangeEventArgs args)
-    {
-        if (!string.IsNullOrEmpty((string)args.Value) && ((string)args.Value).All(Char.IsDigit))
-            user.CorrectAnswers = int.Parse((string)args.Value);
-        else
-            user.CorrectAnswers = 0;
-        UserService.Update(user);
-    }
-    private void UpdateIA(UserInfo user, ChangeEventArgs args)
-    {
-        if (!string.IsNullOrEmpty((string)args.Value) && ((string)args.Value).All(Char.IsDigit))
-            user.IncorrectAnswers = int.Parse((string)args.Value);
-        else
-            user.IncorrectAnswers = 0;
-        UserService.Update(user);
-    }
+
     private async Task Save()
     {
         await UserService.SaveAsync();
@@ -107,7 +151,7 @@
         {
             getQuiz();
         }
-            
+
         InvokeAsync(StateHasChanged);
     }
 }

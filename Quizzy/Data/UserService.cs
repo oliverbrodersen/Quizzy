@@ -35,7 +35,7 @@ namespace Quizzy.Data
             if(!authChech)
             {
                 AuthUser auth = new AuthUser() { Key = Username, Hash = Password };
-                UserInfo User = new UserInfo() { Id = Username, CorrectAnswers = 0, IncorrectAnswers = 0, Score = 0 };
+                UserInfo User = new UserInfo() { Id = Username, CorrectAnswers = 0, IncorrectAnswers = 0, Score = 0, SecurityLevel = 0 , LastQuestionAnswers = ""};
 
                 ctx.AuthUser.Add(auth);
                 ctx.UserInfo.Add(User);
@@ -60,10 +60,14 @@ namespace Quizzy.Data
             Console.WriteLine("Saved");
         }
 
-        public async Task<List<UserInfo>> UpdateScore(bool won, string diff, string id)
+        public async Task<List<UserInfo>> UpdateScore(bool won, string q, string diff, string id)
         {
             UserInfo user = await ctx.UserInfo.FirstAsync(u => u.Id.Equals(id));
-            if (won)
+            if (user.LastQuestionAnswers.Equals(q))
+            {
+                return null;
+            }
+            else if (won)
             {
                 user.CorrectAnswers += 1;
                 user.Score += Quiz.GetPoint(diff);
@@ -71,14 +75,18 @@ namespace Quizzy.Data
             else
                 user.IncorrectAnswers += 1;
 
+            user.LastQuestionAnswers = q;
             ctx.Update(user);
             await ctx.SaveChangesAsync();
+
+            this.user = user;
             return await GetLeaderboard();
         }
 
         public async Task<UserInfo> ValidateUserAsync(string key, string hash)
         {
-            AuthUser first = await ctx.AuthUser.FirstAsync(a => a.Key.ToLower().Equals(key.ToLower()) || a.Hash.ToLower().Equals(hash.ToLower()));
+            Console.WriteLine(hash);
+            AuthUser first = await ctx.AuthUser.FirstAsync(a => a.Key.ToLower().Equals(key.ToLower()) && a.Hash.ToLower().Equals(hash.ToLower()));
             if (first == null)
             {
                 throw new Exception("User not found");
