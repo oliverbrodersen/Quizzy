@@ -66,6 +66,42 @@ a, .btn-link {
     padding-bottom: 6rem;
 
 }
+.adminTable {
+    box-shadow: none;
+    width: 80%;
+}
+    .adminTable td {
+        white-space: nowrap;
+        overflow-x: auto;
+        min-width: 6rem;
+        max-width: 15rem;
+        padding: .1rem .3rem;
+    }
+
+    .adminTable td input{
+        width: 5rem;
+    }
+/* width */
+        .adminTable td::-webkit-scrollbar {
+            height: .3rem;
+            max-width: 5rem !important;
+        }
+
+/* Track */
+        .adminTable td::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+/* Handle */
+        .adminTable td::-webkit-scrollbar-thumb {
+            background: #888;
+            cursor: grabbing;
+        }
+
+    /* Handle on hover */
+            .adminTable td::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
 .leaderboard {
     width: 19rem;
     padding: 1.2rem 0.8rem;
@@ -75,24 +111,30 @@ a, .btn-link {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    margin:3rem;
+    margin: 3rem;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 }
-.leaderboard table {
-    text-overflow: ellipsis;
-}
-.leaderboard table tr:first-of-type{
-    color: #777;
-}
-    .leaderboard table .check {
+    .leaderboard table tr:first-of-type, .adminTable tr:first-of-type {
+        color: #777;
+    }
+    .leaderboard table .check, .adminTable .check {
         color: var(--green);
     }
-    .leaderboard table .x {
+    .leaderboard table .x, .adminTable .x {
         color: var(--red);
     }
-.leaderboard table td{
-    text-align: center;
-    padding: .1rem .3rem;
+    .leaderboard table td {
+        text-align: center;
+        padding: .1rem .3rem;
+        height: 2rem;
+        max-width: 9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+.adminQuestion{
+    font-size: 2rem;
+    margin-bottom: 0rem !important;
 }
 .quiz {
     width: 100%;

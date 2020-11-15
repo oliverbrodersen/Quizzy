@@ -10,8 +10,12 @@ namespace Quizzy.Data
     {
         Task<UserInfo> ValidateUserAsync(string Username, string Password);
         UserInfo GetUser();
+        Task SaveAsync();
+        Task DeleteUser(string Id);
+        void Update(UserInfo u);
         Task<List<UserInfo>> UpdateScore(bool won, string diff, string id);
-        List<UserInfo> GetLeaderboard();
+        Task<List<UserInfo>> GetLeaderboard();
         Task<bool> RegisterAsync(string Username, string Password);
+
     }
 }

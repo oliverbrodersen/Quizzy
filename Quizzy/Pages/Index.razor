@@ -63,7 +63,6 @@
         private List<bool> SelectedAnswer = new List<bool>();
         private List<string> Answers;
         private List<UserInfo> userInfos;
-        private System.Timers.Timer t;
         private string TimeLeft { get; set; }
         private string _SelectedAnswer;
         private string TimeState = "";
@@ -71,14 +70,14 @@
         private bool hasAnswered = false;
 
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
             getQuiz();
-            userInfos = UserService.GetLeaderboard();
+            userInfos = await UserService.GetLeaderboard();
             QuizService.SomethingHappened += HandleEvent;
         }
 
-        private void getQuiz()
+        private async Task getQuiz()
         {
             SelectedType = "";
             SelectedAnswer.Clear();
@@ -88,7 +87,7 @@
             SelectedType = "selected";
             _SelectedAnswer = null;
             hasAnswered = false;
-            userInfos = UserService.GetLeaderboard();
+            userInfos = await UserService.GetLeaderboard();
         }
 
         public void SelectAnswer(int i)
@@ -134,15 +133,11 @@
 
             if (t <= 5) TimeState = "state2";
             else if (t <= 10) TimeState = "state1";
-            else if (t == 20) {
-                if (!quiz.question.Equals(((QuizService)sender).qurrentQuiz.question))
-                {
-                    getQuiz();
-                }
-                TimeState = "";
-            }
             else TimeState = "";
-
+            if (!quiz.question.Equals(((QuizService)sender).qurrentQuiz.question))
+            {
+                getQuiz();
+            }
             InvokeAsync(StateHasChanged);
         }
     }

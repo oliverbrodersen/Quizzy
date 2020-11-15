@@ -18,9 +18,9 @@ namespace Quizzy.Data
             this.ctx = ctx;
         }
 
-        public List<UserInfo> GetLeaderboard()
+        public async Task<List<UserInfo>> GetLeaderboard()
         {
-            List<UserInfo> ui = ctx.UserInfo.OrderByDescending(x => x.Score).Take(5).ToList();
+            List<UserInfo> ui = await ctx.UserInfo.OrderByDescending(x => x.Score).Take(5).ToListAsync();
             ui.OrderByDescending(u => u.Score);
             return ui;
         }
@@ -48,6 +48,18 @@ namespace Quizzy.Data
             return true;
         }
 
+        public void Update(UserInfo u)
+        {
+            ctx.Update(u);
+            Console.WriteLine("Updated");
+        }
+
+        public async Task SaveAsync()
+        {
+            await ctx.SaveChangesAsync();
+            Console.WriteLine("Saved");
+        }
+
         public async Task<List<UserInfo>> UpdateScore(bool won, string diff, string id)
         {
             UserInfo user = await ctx.UserInfo.FirstAsync(u => u.Id.Equals(id));
@@ -61,7 +73,7 @@ namespace Quizzy.Data
 
             ctx.Update(user);
             await ctx.SaveChangesAsync();
-            return GetLeaderboard();
+            return await GetLeaderboard();
         }
 
         public async Task<UserInfo> ValidateUserAsync(string key, string hash)
@@ -77,6 +89,18 @@ namespace Quizzy.Data
                 Console.WriteLine("Welcome, " + user.Id);
             }
             return user;
+        }
+
+        public async Task DeleteUser(string Id)
+        {
+            UserInfo ui= ctx.UserInfo.SingleOrDefault(x => x.Id.Equals(Id)); //returns a single item.
+            AuthUser au= ctx.AuthUser.SingleOrDefault(x => x.Key.Equals(Id)); //returns a single item.
+
+            if (ui != null && au != null)
+            {
+                ctx.UserInfo.Remove(ui);
+                ctx.AuthUser.Remove(au);
+            }
         }
     }
 }

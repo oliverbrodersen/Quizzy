@@ -1,0 +1,113 @@
+﻿@page "/admin"
+@using System.Web;
+@using Quizzy.Models;
+@using Quizzy.Data;
+@inject IUserService UserService;
+@inject QuizService QuizService;
+
+<div class="quizContainer">
+    <div class="quiz">
+        <p>Qurrent querstion:</p>
+        <h1 class="adminQuestion">@decodeHtml(quiz.question)?</h1>
+        <div class="info">
+            <p>@TimeLeft</p>
+            <p>Answer: @decodeHtml(quiz.correct_answer)</p>
+        </div>
+        <table class="adminTable">
+            <tr>
+                <td>User</td>
+                <td>Score</td>
+                <td class="check">&#x2713;</td>
+                <td class="x">&#119857;</td>
+                <td class="trash">&#128465;</td>
+            </tr>
+            @foreach (UserInfo ui in userInfos)
+            {
+                <tr>
+                    <td>@ui.Id</td>
+                    <td><input type="number" value="@ui.Score" @onchange="@(e => UpdateScore(ui,e))" /></td>
+                    <td><input type="number" value="@ui.CorrectAnswers" @onchange="@(e => UpdateCA(ui,e))" /></td>
+                    <td><input type="number" value="@ui.IncorrectAnswers" @onchange="@(e => UpdateIA(ui,e))" /></td>
+                    <td><button class="trashButton" @onclick="@(() => DeleteUser(@ui.Id))">&#128465;</button></td>
+                </tr>
+            }
+        </table>
+        <input type="button" value="Save" @onclick="Save" />
+        <input type="button" value="Next Question" @onclick="Next" />
+    </div>
+</div>
+
+@code {
+    private List<UserInfo> userInfos;
+    private Quiz quiz { get; set; }
+    private string TimeLeft { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        userInfos = await UserService.GetLeaderboard();
+        getQuiz();
+        QuizService.SomethingHappened += HandleEvent;
+    }
+
+    private void Next()
+    {
+        QuizService.getResult();
+    }
+
+    private async Task getQuiz()
+    {
+        quiz = QuizService.getQuizAsync();
+    }
+
+    private async Task DeleteUser(string id)
+    {
+        await UserService.DeleteUser(id);
+        UserInfo ui = userInfos.SingleOrDefault(x => x.Id.Equals(id));
+        if (ui != null)
+            userInfos.Remove(ui);
+    }
+    private void UpdateScore(UserInfo user, ChangeEventArgs args)
+    {
+        if (!string.IsNullOrEmpty((string)args.Value) && ((string)args.Value).All(Char.IsDigit))
+            user.Score = int.Parse((string)args.Value);
+        else
+            user.Score = 0;
+        UserService.Update(user);
+    }
+    private void UpdateCA(UserInfo user, ChangeEventArgs args)
+    {
+        if (!string.IsNullOrEmpty((string)args.Value) && ((string)args.Value).All(Char.IsDigit))
+            user.CorrectAnswers = int.Parse((string)args.Value);
+        else
+            user.CorrectAnswers = 0;
+        UserService.Update(user);
+    }
+    private void UpdateIA(UserInfo user, ChangeEventArgs args)
+    {
+        if (!string.IsNullOrEmpty((string)args.Value) && ((string)args.Value).All(Char.IsDigit))
+            user.IncorrectAnswers = int.Parse((string)args.Value);
+        else
+            user.IncorrectAnswers = 0;
+        UserService.Update(user);
+    }
+    private async Task Save()
+    {
+        await UserService.SaveAsync();
+    }
+    private string decodeHtml(string s)
+    {
+        return HttpUtility.HtmlDecode(s);
+    }
+    public void HandleEvent(object sender, EventArgs args)
+    {
+        TimeLeft = ((QuizService)sender).GetTimeLeft();
+        int t = int.Parse(TimeLeft);
+        if (!quiz.question.Equals(((QuizService)sender).qurrentQuiz.question))
+        {
+            getQuiz();
+        }
+            
+        InvokeAsync(StateHasChanged);
+    }
+}
