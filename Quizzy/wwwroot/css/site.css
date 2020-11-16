@@ -347,7 +347,7 @@ table td p{
         width: 0;
         bottom: 1px;
         position: absolute;
-        background: #3bc061;
+        background: var(--bg);
         transition: 0.2s ease all;
         -moz-transition: 0.2s ease all;
         -webkit-transition: 0.2s ease all;
