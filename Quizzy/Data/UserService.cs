@@ -21,9 +21,10 @@ namespace Quizzy.Data
         public async Task<List<UserInfo>> GetLeaderboard()
         {
             List<UserInfo> ui = await ctx.UserInfo.OrderByDescending(x => x.Score).Take(5).ToListAsync();
-            ui.OrderByDescending(u => u.Score);
+            Console.WriteLine($"{ui[0].Score} {ui[1].Score}");
             return ui;
         }
+
         public UserInfo GetUser()
         {
             return user;
@@ -32,10 +33,10 @@ namespace Quizzy.Data
         public async Task<bool> RegisterAsync(string Username, string Password)
         {
             bool authChech = ctx.AuthUser.Any(u => u.Key.ToLower().Equals(Username.ToLower()));
-            if(!authChech)
+            if (!authChech)
             {
                 AuthUser auth = new AuthUser() { Key = Username, Hash = Password };
-                UserInfo User = new UserInfo() { Id = Username, CorrectAnswers = 0, IncorrectAnswers = 0, Score = 0, SecurityLevel = 0 , LastQuestionAnswers = ""};
+                UserInfo User = new UserInfo() { Id = Username, CorrectAnswers = 0, IncorrectAnswers = 0, Score = 0, SecurityLevel = 0, LastQuestionAnswers = "" };
 
                 ctx.AuthUser.Add(auth);
                 ctx.UserInfo.Add(User);
@@ -80,7 +81,8 @@ namespace Quizzy.Data
             await ctx.SaveChangesAsync();
 
             this.user = user;
-            return await GetLeaderboard();
+            List<UserInfo> lb = await GetLeaderboard();
+            return lb;
         }
 
         public async Task<UserInfo> ValidateUserAsync(string key, string hash)
@@ -101,8 +103,8 @@ namespace Quizzy.Data
 
         public async Task DeleteUser(string Id)
         {
-            UserInfo ui= ctx.UserInfo.SingleOrDefault(x => x.Id.Equals(Id)); //returns a single item.
-            AuthUser au= ctx.AuthUser.SingleOrDefault(x => x.Key.Equals(Id)); //returns a single item.
+            UserInfo ui = ctx.UserInfo.SingleOrDefault(x => x.Id.Equals(Id)); //returns a single item.
+            AuthUser au = ctx.AuthUser.SingleOrDefault(x => x.Key.Equals(Id)); //returns a single item.
 
             if (ui != null && au != null)
             {

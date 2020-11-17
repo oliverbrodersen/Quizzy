@@ -1,12 +1,14 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 @import url('https://fonts.googleapis.com/css2?family=Catamaran:wght@800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
 :root {
     --bg: #f9c74f;
     --red: #d12d0c;
     --yellow: #faa307;
     --green: #3bc061;
 }
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     background: var(--bg);
@@ -15,9 +17,11 @@ html, body {
 a, .btn-link {
     color: #0366d6;
 }
+
 p, h1, h2, input, a {
     font-family: 'Roboto', sans-serif;
 }
+
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
@@ -55,13 +59,14 @@ p, h1, h2, input, a {
     z-index: 1000;
 }
 
-#blazor-error-ui .dismiss {
-    cursor: pointer;
-    position: absolute;
-    right: 0.75rem;
-    top: 0.5rem;
-}
-table input[type=button]{
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
+
+table input[type=button] {
     padding: .3rem 1rem;
     background: white;
     margin-top: 1rem;
@@ -69,20 +74,25 @@ table input[type=button]{
     border-radius: .2rem;
     border: .2rem solid var(--bg);
 }
+
 table input[type=number] {
     padding: .2rem .3rem;
     width: 8rem;
 }
-table td select{
+
+table td select {
     padding: .3rem;
 }
-table td p{
+
+table td p {
     margin-bottom: 0;
 }
-.trash{
+
+.trash {
     text-align: center;
 }
-.trashButton{
+
+.trashButton {
     background: var(--red);
     color: white;
     border: none;
@@ -91,12 +101,14 @@ table td p{
     margin-left: 50%;
     transform: translateX(-50%);
 }
-.seperator{
+
+.seperator {
     width: 100%;
     height: .2rem;
     background-color: var(--bg);
-    margin:2rem 0;
+    margin: 2rem 0;
 }
+
 .quizContainer {
     width: 100%;
     display: flex;
@@ -105,10 +117,12 @@ table td p{
     flex-wrap: wrap;
     padding-bottom: 6rem;
 }
+
 .adminTable {
     box-shadow: none;
     width: 80%;
 }
+
     .adminTable td {
         white-space: nowrap;
         overflow-x: auto;
@@ -117,30 +131,31 @@ table td p{
         padding: .1rem .3rem;
     }
 
-    .adminTable td input{
-        width: 5rem;
-    }
-/* width */
+        .adminTable td input {
+            width: 5rem;
+        }
+        /* width */
         .adminTable td::-webkit-scrollbar {
             height: .3rem;
             max-width: 5rem !important;
         }
 
-/* Track */
+        /* Track */
         .adminTable td::-webkit-scrollbar-track {
             background: #f1f1f1;
         }
 
-/* Handle */
+        /* Handle */
         .adminTable td::-webkit-scrollbar-thumb {
             background: #888;
             cursor: grabbing;
         }
 
-    /* Handle on hover */
+            /* Handle on hover */
             .adminTable td::-webkit-scrollbar-thumb:hover {
                 background: #555;
             }
+
 .leaderboard {
     width: 19rem;
     padding: 1.2rem 0.8rem;
@@ -153,15 +168,19 @@ table td p{
     margin: 3rem;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 }
+
     .leaderboard table tr:first-of-type, .adminTable tr:first-of-type {
         color: #777;
     }
+
     .leaderboard table .check, .adminTable .check {
         color: var(--green);
     }
+
     .leaderboard table .x, .adminTable .x {
         color: var(--red);
     }
+
     .leaderboard table td {
         text-align: center;
         padding: .1rem .3rem;
@@ -171,10 +190,12 @@ table td p{
         overflow: hidden;
         text-overflow: ellipsis;
     }
-.adminQuestion{
+
+.adminQuestion {
     font-size: 2rem;
     margin-bottom: 0rem !important;
 }
+
 .logo {
     width: auto;
     text-align: center;
@@ -184,6 +205,7 @@ table td p{
     font-family: 'Catamaran', sans-serif;
     top: .3rem;
 }
+
 .quiz {
     width: 100%;
     padding: 4rem 7rem;
@@ -195,76 +217,86 @@ table td p{
     transition: all .2s ease;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 }
-.quiz h1 {
-    margin-bottom: 3rem;
-}
-.quiz .answerContainer {
-    display: flex;
-    justify-content: space-around;
-}
-.quiz .answerContainer p {
-    padding: .5rem 1rem;
-    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-    border-radius: .3rem;
-    margin: .5rem;
-    font-size: 1.5rem;
-    border: .2rem solid var(--bg);
-    box-sizing: border-box;
-    cursor: pointer;
-    background: white;
-    transition: transform .2s ease;
-    text-align: center;
-    transition: all .2s ease;
-}
-.quiz .answerContainer p:hover {
-    transform: scale(1.2);
-}
-    .quiz .answerContainer p.selected {
-        background: var(--bg);
-        border-color: var(--bg);
-        color: white;
+
+    .quiz h1 {
+        margin-bottom: 3rem;
     }
 
-    .quiz .answerContainer p.correct {
-        background: var(--green);
-        border-color: var(--green);
-        color: white;
-    }
-    .quiz .answerContainer p.incorrect {
-        background: var(--red);
-        border-color: var(--red);
-        color: white;
+    .quiz .answerContainer {
+        display: flex;
+        justify-content: space-around;
     }
 
-.quiz .info {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-}
-.quiz .info .time{
-    font-size: 1rem;
-    height: 3rem;
-    width: 3rem;
-    background: white;
-    border: .2rem solid var(--bg);
-    border-radius: .3rem;
-    padding: .5rem 0;
-    text-align: center;
-    font-weight: 900;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-    transition: .1s ease all;
-}
+        .quiz .answerContainer p {
+            padding: .5rem 1rem;
+            box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+            border-radius: .3rem;
+            margin: .5rem;
+            font-size: 1.5rem;
+            border: .2rem solid var(--bg);
+            box-sizing: border-box;
+            cursor: pointer;
+            background: white;
+            transition: transform .2s ease;
+            text-align: center;
+            transition: all .2s ease;
+        }
+
+            .quiz .answerContainer p:hover {
+                transform: scale(1.2);
+            }
+
+            .quiz .answerContainer p.selected {
+                background: var(--bg);
+                border-color: var(--bg);
+                color: white;
+            }
+
+            .quiz .answerContainer p.correct {
+                background: var(--green);
+                border-color: var(--green);
+                color: white;
+            }
+
+            .quiz .answerContainer p.incorrect {
+                background: var(--red);
+                border-color: var(--red);
+                color: white;
+            }
+
+    .quiz .info {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+        .quiz .info .time {
+            font-size: 1rem;
+            height: 3rem;
+            width: 3rem;
+            background: white;
+            border: .2rem solid var(--bg);
+            border-radius: .3rem;
+            padding: .5rem 0;
+            text-align: center;
+            font-weight: 900;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+            transition: .1s ease all;
+        }
+
 .time.state1 {
     color: white;
     background: var(--yellow) !important;
     border: .2rem solid var(--yellow) !important;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
 }
+
 .time.state2 {
     color: white;
     background: var(--red) !important;
     border: .2rem solid var(--red) !important;
 }
+
 .quiz .loading {
     width: 100%;
     text-align: center;
@@ -276,29 +308,31 @@ table td p{
     transform: translateY(-50%);
 }
 
-    .quiz .answerButton {
-        width: 20rem;
-        margin-top: 2rem;
-        font-size: 2rem;
-        color: white;
-        background-color: var(--bg);
-        margin-left: 50%;
-        padding: .6rem 1.5rem;
-        border-radius: .5rem;
-        transform: translateX(-50%) scale(1);
-        cursor: pointer;
-        border: none;
-        transition: transform .1s ease;
-        box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+.quiz .answerButton {
+    width: 20rem;
+    margin-top: 2rem;
+    font-size: 2rem;
+    color: white;
+    background-color: var(--bg);
+    margin-left: 50%;
+    padding: .6rem 1.5rem;
+    border-radius: .5rem;
+    transform: translateX(-50%) scale(1);
+    cursor: pointer;
+    border: none;
+    transition: transform .1s ease;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+}
+
+    .quiz .answerButton:hover, .quiz .answerButton:active, .quiz .answerButton:focus {
+        transform: translateX(-50%) scale(1.1);
+        outline: none;
     }
-        .quiz .answerButton:hover, .quiz .answerButton:active, .quiz .answerButton:focus {
-            transform: translateX(-50%) scale(1.1);
-            outline: none;
-        }
-        .loginForm .group {
-        position: relative;
-        margin-bottom: 45px;
-    }
+
+.loginForm .group {
+    position: relative;
+    margin-bottom: 45px;
+}
 
 .loginForm input {
     font-size: 18px;
@@ -383,20 +417,25 @@ table td p{
     -moz-animation: inputHighlighter 0.3s ease;
     animation: inputHighlighter 0.3s ease;
 }
-.loginForm{
+
+.loginForm {
     display: flex;
     justify-content: center;
 }
+
 .loginFormCenter {
     width: 700px;
 }
+
 .loginForm a {
     color: var(--bg);
 }
-.loginForm h2{
+
+.loginForm h2 {
     margin-bottom: 2rem;
 }
-.loginForm table td{
+
+.loginForm table td {
     padding: 0 25px;
 }
 /* ANIMATIONS ================ */
